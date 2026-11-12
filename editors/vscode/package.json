@@ -1,0 +1,159 @@
+{
+  "name": "webforms",
+  "displayName": "ASP.NET WebForms (VB)",
+  "description": "Language support for ASP.NET WebForms VB.NET Web Application Projects: .aspx / .ascx / .master highlighting, navigation, completion, diagnostics, designer generation and VB formatting, from the webforms language server.",
+  "version": "0.8.1",
+  "publisher": "pharmica",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PharmicaUK/webforms-tools"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Formatters",
+    "Linters"
+  ],
+  "keywords": [
+    "aspx",
+    "webforms",
+    "asp.net",
+    "vb.net",
+    "designer"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onLanguage:aspx",
+    "onLanguage:vb",
+    "workspaceContains:**/*.vbproj"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "aspx",
+        "aliases": [
+          "ASP.NET WebForms",
+          "aspx"
+        ],
+        "extensions": [
+          ".aspx",
+          ".ascx",
+          ".master"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "aspx",
+        "scopeName": "text.html.aspx",
+        "path": "./syntaxes/aspx.tmLanguage.json",
+        "embeddedLanguages": {
+          "source.asp.vb.net": "vb",
+          "source.css": "css",
+          "source.js": "javascript"
+        }
+      }
+    ],
+    "commands": [
+      {
+        "command": "webforms.generateDesignerForActiveFile",
+        "title": "Generate Designer",
+        "category": "WebForms"
+      },
+      {
+        "command": "webforms.restartServer",
+        "title": "Restart Language Server",
+        "category": "WebForms"
+      },
+      {
+        "command": "webforms.showOutput",
+        "title": "Show Language Server Output",
+        "category": "WebForms"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "webforms.generateDesignerForActiveFile",
+          "when": "editorLangId == aspx || editorLangId == vb"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "webforms.generateDesignerForActiveFile",
+          "when": "editorLangId == aspx",
+          "group": "1_modification"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "WebForms",
+      "properties": {
+        "webforms.server.path": {
+          "type": "string",
+          "default": "webforms",
+          "markdownDescription": "The `webforms` executable (the `Pharmica.WebForms.Tools` dotnet tool). The default finds it on `PATH` (`dotnet tool install -g Pharmica.WebForms.Tools`).",
+          "scope": "machine-overridable"
+        },
+        "webforms.server.log": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "A file the server appends a request log to (`webforms lsp --log <file>`). Empty: no log.",
+          "scope": "machine-overridable"
+        },
+        "webforms.generateDesignerOnSave": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Regenerate the `.designer.vb` file when a markup file is saved, as Visual Studio does."
+        },
+        "webforms.completion.zeroArgHandlers": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Offer parameterless Subs as event handlers (`OnClick=\"...\"`). Valid VB, but almost any helper Sub qualifies, so they are left out by default."
+        },
+        "webforms.codeBlocks.enabled": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "VB in markup code blocks (`<% %>`, `<%= %>`, `<%# %>`, `<script runat=\"server\">`): completion, hover, definition and BC errors. Compiles the whole project in the server (about 450 MB per project, dropped after 10 idle minutes)."
+        },
+        "webforms.diagnostics.staleDesigner": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Report `WF0100` when a saved markup file's `.designer.vb` is out of date or missing (fixed by the *Generate Designer* code action)."
+        },
+        "webforms.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the language server (in the output channel)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --platform=node --format=cjs --target=node18 --external:vscode --outfile=out/extension.js",
+    "check": "tsc --noEmit",
+    "package": "npm run check && npm run build -- --minify && node -e \"require('fs').mkdirSync('../../artifacts/vsix',{recursive:true})\" && node -e \"require('fs').copyFileSync('../../LICENSE','LICENSE')\" && vsce package --no-dependencies --out ../../artifacts/vsix/",
+    "test": "npm run build && tsc -p tsconfig.test.json && node out/test/runTest.js"
+  },
+  "dependencies": {
+    "vscode-languageclient": "9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.10",
+    "@types/vscode": "1.90.0",
+    "@vscode/test-electron": "2.4.1",
+    "@vscode/vsce": "3.2.1",
+    "esbuild": "0.23.0",
+    "typescript": "5.5.3"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "webforms",
+  "displayName": "ASP.NET WebForms (VB)",
+  "version": "0.8.1",
+  "description": "Code intelligence for ASP.NET WebForms VB.NET Web Application Projects: the webforms language server (navigation from markup to code-behind, diagnostics after edits) and hooks that regenerate .designer.vb files after markup edits and block hand edits to them.",
+  "license": "MIT",
+  "author": {
+    "name": "Pharmica"
+  },
+  "homepage": "https://github.com/PharmicaUK/webforms-tools",
+  "repository": "https://github.com/PharmicaUK/webforms-tools",
+  "keywords": ["aspx", "webforms", "vb.net", "lsp", "designer"]
+}

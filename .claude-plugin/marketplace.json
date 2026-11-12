@@ -1,0 +1,14 @@
+{
+  "name": "webforms-tools",
+  "description": "Claude Code plugins for ASP.NET WebForms VB.NET projects (from PharmicaUK/webforms-tools).",
+  "owner": {
+    "name": "Pharmica"
+  },
+  "plugins": [
+    {
+      "name": "webforms",
+      "source": "./editors/claude-code",
+      "description": "The webforms language server (markup <-> code-behind navigation, diagnostics after edits) and designer hooks (regenerate .designer.vb after markup edits, block hand edits)."
+    }
+  ]
+}

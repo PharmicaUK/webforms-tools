@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/WebForms.Cli/WebForms.Cli.csproj" />
+    <Project Path="src/WebForms.Designer/WebForms.Designer.csproj" />
+    <Project Path="src/WebForms.Formatting/WebForms.Formatting.csproj" />
+    <Project Path="src/WebForms.LanguageServer/WebForms.LanguageServer.csproj" />
+    <Project Path="src/WebForms.Markup/WebForms.Markup.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/WebForms.Tests/WebForms.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/CorpusReport/CorpusReport.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WebForms.Designer\WebForms.Designer.csproj" />
+    <ProjectReference Include="..\..\src\WebForms.Formatting\WebForms.Formatting.csproj" />
+    <ProjectReference Include="..\..\src\WebForms.LanguageServer\WebForms.LanguageServer.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+</Project>

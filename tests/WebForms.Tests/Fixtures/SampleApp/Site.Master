@@ -1,0 +1,3 @@
+<%@ Master Language="VB" CodeBehind="Site.Master.vb" Inherits="SampleApp.SiteMaster" %>
+<html><head runat="server" id="Head1"><title>t</title></head>
+<body><form id="form1" runat="server"><asp:ContentPlaceHolder ID="Main" runat="server" /></form></body></html>

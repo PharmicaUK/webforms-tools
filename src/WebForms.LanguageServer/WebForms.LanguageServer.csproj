@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- ASPX language server (`webforms lsp`): LSP over stdio, hand-rolled on System.Text.Json (source-generated) to
+       keep startup and dependencies small. Reuses the designer pipeline for markup and Roslyn syntax trees for the
+       code-behind navigation; code blocks in markup get a Roslyn compilation of the whole project (CodeBlocks/). -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebForms.Designer\WebForms.Designer.csproj" />
+    <ProjectReference Include="..\WebForms.Formatting\WebForms.Formatting.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Completion and quick info in markup code blocks; pinned with the formatter's Roslyn. -->
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Features" Version="[5.9.0]" />
+  </ItemGroup>
+
+</Project>

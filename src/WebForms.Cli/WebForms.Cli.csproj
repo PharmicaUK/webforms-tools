@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>webforms</AssemblyName>
+    <RootNamespace>WebForms.Cli</RootNamespace>
+
+    <!-- dotnet tool. Portable (no RuntimeIdentifiers) on purpose: RID-specific tool packages install a .cmd
+         shim, which Git Bash and libuv (Neovim's vim.system) cannot launch by bare name. -->
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>webforms</ToolCommandName>
+    <PackageId>Pharmica.WebForms.Tools</PackageId>
+    <Version>0.8.1</Version>
+    <Description>Tooling for ASP.NET WebForms (VB.NET) Web Application Projects: regenerate .designer.vb files from markup, format VB like Visual Studio, and an ASPX language server, outside Visual Studio.</Description>
+    <PackageTags>webforms;aspnet;vbnet;designer;formatter;lsp;dotnet-tool</PackageTags>
+    <PackageProjectUrl>https://github.com/PharmicaUK/webforms-tools</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)..\..\artifacts\nupkg</PackageOutputPath>
+
+    <!-- Startup time matters (runs on every save). -->
+    <TieredPGO>false</TieredPGO>
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
+  </PropertyGroup>
+
+  <!-- `dotnet pack` only: ReadyToRun-compile the tool (incl. Roslyn) for win-x64, which roughly halves startup
+       (format 950 -> 530 ms on a 1,800-line file; conform.nvim's default timeout is 1000 ms). UseAppHost=false
+       keeps the "dotnet" runner, so the installed shim is still webforms.exe, not a .cmd (see above). The
+       package is Windows x64 only, like the .NET Framework reference assemblies it reads. Pack without
+       no-build: the RID-specific build is separate from the normal one. -->
+  <PropertyGroup Condition="'$(_IsPacking)' == 'true'">
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <UseAppHost>false</UseAppHost>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebForms.Designer\WebForms.Designer.csproj" />
+    <ProjectReference Include="..\WebForms.Formatting\WebForms.Formatting.csproj" />
+    <ProjectReference Include="..\WebForms.LanguageServer\WebForms.LanguageServer.csproj" />
+  </ItemGroup>
+
+</Project>

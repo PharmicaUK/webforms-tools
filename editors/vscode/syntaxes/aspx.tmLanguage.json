@@ -1,0 +1,191 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "ASP.NET WebForms",
+  "scopeName": "text.html.aspx",
+  "comment": "HTML (VS Code's text.html.basic) with the server constructs injected everywhere, also inside attribute values and client <script> / <style>; code blocks embed VS Code's VB grammar (source.asp.vb.net).",
+  "patterns": [
+    { "include": "#server" },
+    { "include": "text.html.basic" }
+  ],
+  "injections": {
+    "L:text.html.aspx - (source.asp.vb.net | comment.block.server.aspx | meta.directive.aspx | meta.embedded.expression-builder.aspx)": {
+      "patterns": [{ "include": "#server" }]
+    },
+    "L:text.html.aspx meta.tag - (meta.tag.server.aspx | source.asp.vb.net | string | comment)": {
+      "patterns": [
+        { "include": "#attribute-with-code" },
+        {
+          "comment": "<div runat=\"server\" /> and other self-closed non-void tags are fine in WebForms; HTML marks the slash invalid.",
+          "match": "/(?=>)",
+          "name": "punctuation.definition.tag.end.html"
+        }
+      ]
+    }
+  },
+  "repository": {
+    "server": {
+      "patterns": [
+        { "include": "#server-comment" },
+        { "include": "#directive" },
+        { "include": "#expression-builder" },
+        { "include": "#code-block" },
+        { "include": "#server-script" },
+        { "include": "#server-tag" }
+      ]
+    },
+    "attribute-with-code": {
+      "comment": "An HTML attribute whose quoted value has a server block before its closing quote. HTML tokenizes some values (onclick=, style=) with one regex that stops at the first quote, which may be inside the VB (f('<%= Session(\"A\") %>')): such values become plain strings with the blocks injected.",
+      "patterns": [
+        {
+          "name": "meta.attribute.aspx",
+          "begin": "([A-Za-z_:@][\\w:.-]*)\\s*(=)\\s*(\")(?=(?:[^\"<]|<(?!%))*<%)",
+          "end": "\"",
+          "beginCaptures": {
+            "1": { "name": "entity.other.attribute-name.html" },
+            "2": { "name": "punctuation.separator.key-value.html" },
+            "3": { "name": "string.quoted.double.html punctuation.definition.string.begin.html" }
+          },
+          "endCaptures": { "0": { "name": "string.quoted.double.html punctuation.definition.string.end.html" } },
+          "contentName": "string.quoted.double.html"
+        },
+        {
+          "name": "meta.attribute.aspx",
+          "begin": "([A-Za-z_:@][\\w:.-]*)\\s*(=)\\s*(')(?=(?:[^'<]|<(?!%))*<%)",
+          "end": "'",
+          "beginCaptures": {
+            "1": { "name": "entity.other.attribute-name.html" },
+            "2": { "name": "punctuation.separator.key-value.html" },
+            "3": { "name": "string.quoted.single.html punctuation.definition.string.begin.html" }
+          },
+          "endCaptures": { "0": { "name": "string.quoted.single.html punctuation.definition.string.end.html" } },
+          "contentName": "string.quoted.single.html"
+        }
+      ]
+    },
+    "server-tag": {
+      "comment": "Prefixed server controls (<asp:Button>, <uc:Widget>) and inner properties / collection items (<ItemTemplate>, <Triggers>, <asp:ListItem>): HTML marks them invalid.illegal.unrecognized-tag. Inner properties are recognised by their capital first letter (HTML in the corpus is lowercase; an uppercase HTML tag is still coloured as a tag). Values are begin/end strings so that <%# %> inside them is still injected.",
+      "name": "meta.tag.server.aspx",
+      "begin": "(</?)([A-Za-z][\\w-]*:[A-Za-z][\\w.-]*|[A-Z][\\w.-]*)(?=[\\s/>])",
+      "end": "(/?>)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.html" },
+        "2": { "name": "entity.name.tag.aspx" }
+      },
+      "endCaptures": { "1": { "name": "punctuation.definition.tag.end.html" } },
+      "patterns": [
+        { "match": "[A-Za-z_][\\w:.-]*", "name": "entity.other.attribute-name.aspx" },
+        { "match": "=", "name": "punctuation.separator.key-value.aspx" },
+        {
+          "name": "string.quoted.double.aspx",
+          "begin": "\"",
+          "end": "\"",
+          "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.aspx" } },
+          "endCaptures": { "0": { "name": "punctuation.definition.string.end.aspx" } }
+        },
+        {
+          "name": "string.quoted.single.aspx",
+          "begin": "'",
+          "end": "'",
+          "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.aspx" } },
+          "endCaptures": { "0": { "name": "punctuation.definition.string.end.aspx" } }
+        }
+      ]
+    },
+    "server-comment": {
+      "name": "comment.block.server.aspx",
+      "begin": "<%--",
+      "end": "--%>",
+      "beginCaptures": { "0": { "name": "punctuation.definition.comment.begin.aspx" } },
+      "endCaptures": { "0": { "name": "punctuation.definition.comment.end.aspx" } }
+    },
+    "directive": {
+      "name": "meta.directive.aspx",
+      "begin": "(<%)\\s*(@)\\s*([A-Za-z]+)?",
+      "end": "%>",
+      "beginCaptures": {
+        "1": { "name": "punctuation.section.embedded.begin.aspx" },
+        "2": { "name": "keyword.control.directive.aspx" },
+        "3": { "name": "keyword.control.directive.aspx" }
+      },
+      "endCaptures": { "0": { "name": "punctuation.section.embedded.end.aspx" } },
+      "patterns": [{ "include": "#attribute" }]
+    },
+    "attribute": {
+      "patterns": [
+        {
+          "match": "([A-Za-z_][\\w:.-]*)\\s*(=)\\s*(\"[^\"]*\"|'[^']*')",
+          "captures": {
+            "1": { "name": "entity.other.attribute-name.aspx" },
+            "2": { "name": "punctuation.separator.key-value.aspx" },
+            "3": { "name": "string.quoted.aspx" }
+          }
+        },
+        {
+          "match": "([A-Za-z_][\\w:.-]*)\\s*(=)\\s*([^\\s%>]+)",
+          "captures": {
+            "1": { "name": "entity.other.attribute-name.aspx" },
+            "2": { "name": "punctuation.separator.key-value.aspx" },
+            "3": { "name": "string.unquoted.aspx" }
+          }
+        }
+      ]
+    },
+    "expression-builder": {
+      "name": "meta.embedded.expression-builder.aspx",
+      "begin": "(<%)(\\$)\\s*([A-Za-z]\\w*)?\\s*(:)?",
+      "end": "%>",
+      "beginCaptures": {
+        "1": { "name": "punctuation.section.embedded.begin.aspx" },
+        "2": { "name": "keyword.operator.expression-builder.aspx" },
+        "3": { "name": "support.function.expression-builder.aspx" },
+        "4": { "name": "punctuation.separator.aspx" }
+      },
+      "endCaptures": { "0": { "name": "punctuation.section.embedded.end.aspx" } },
+      "patterns": [
+        { "match": "[^%,\\s][^%,]*?(?=\\s*(,|%>))", "name": "string.unquoted.expression-builder.aspx" },
+        { "match": ",", "name": "punctuation.separator.aspx" }
+      ]
+    },
+    "code-block": {
+      "comment": "<% %> statements, <%= %> / <%: %> expressions (also <% =x %>), <%# %> / <%#: %> data binding.",
+      "name": "meta.embedded.block.aspx",
+      "begin": "(<%)(#:|#|=|:|\\s*=)?",
+      "end": "%>",
+      "beginCaptures": {
+        "1": { "name": "punctuation.section.embedded.begin.aspx" },
+        "2": { "name": "keyword.operator.code-block.aspx" }
+      },
+      "endCaptures": { "0": { "name": "punctuation.section.embedded.end.aspx" } },
+      "contentName": "source.asp.vb.net",
+      "patterns": [{ "include": "source.asp.vb.net" }]
+    },
+    "server-script": {
+      "comment": "<script runat=\"server\">: VB members. Client scripts stay HTML's (JavaScript).",
+      "begin": "(?i)(<)(script)(?=[^>]*\\brunat\\s*=\\s*[\"']?server\\b)",
+      "end": "(?i)(</)(script)\\s*(>)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.html" },
+        "2": { "name": "entity.name.tag.html" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.html" },
+        "2": { "name": "entity.name.tag.html" },
+        "3": { "name": "punctuation.definition.tag.end.html" }
+      },
+      "patterns": [
+        {
+          "begin": "\\G",
+          "end": "(>)",
+          "endCaptures": { "1": { "name": "punctuation.definition.tag.end.html" } },
+          "patterns": [{ "include": "#attribute" }]
+        },
+        {
+          "begin": "(?<=>)",
+          "end": "(?i)(?=</script\\s*>)",
+          "contentName": "source.asp.vb.net",
+          "patterns": [{ "include": "source.asp.vb.net" }]
+        }
+      ]
+    }
+  }
+}

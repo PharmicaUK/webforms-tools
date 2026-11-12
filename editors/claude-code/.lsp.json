@@ -1,0 +1,16 @@
+{
+  "webforms": {
+    "command": "webforms",
+    "args": ["lsp"],
+    "extensionToLanguage": {
+      ".aspx": "aspx",
+      ".ascx": "aspx",
+      ".master": "aspx",
+      ".vb": "vb"
+    },
+    "initializationOptions": {
+      "diagnostics": { "staleDesigner": false }
+    },
+    "startupTimeout": 30000
+  }
+}

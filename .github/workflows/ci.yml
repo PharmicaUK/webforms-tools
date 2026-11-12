@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    # Windows: the generator reads the .NET Framework 4.x reference assemblies.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build
+        run: dotnet build -c Release
+
+      - name: Format
+        run: dotnet format WebForms.Tools.slnx --verify-no-changes --no-restore
+
+      - name: Test
+        run: dotnet test tests/WebForms.Tests -c Release --no-build
+
+      - name: Pack
+        # Not --no-build: packing builds the ReadyToRun win-x64 variant (see WebForms.Cli.csproj).
+        run: dotnet pack src/WebForms.Cli -c Release
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nupkg
+          path: artifacts/nupkg/*.nupkg
+
+      # Editor packages (editors/): the VS Code extension is type-checked, packaged and run in a downloaded VS Code
+      # against the tool packed above; the Claude Code plugin's JSON files must parse.
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: editors/vscode/package-lock.json
+
+      - name: Install the packed tool
+        shell: pwsh
+        run: dotnet tool install -g Pharmica.WebForms.Tools --add-source artifacts/nupkg --version "$((Get-ChildItem artifacts/nupkg/Pharmica.WebForms.Tools.*.nupkg).Name -replace '^Pharmica\.WebForms\.Tools\.|\.nupkg$','')"
+
+      - name: VS Code extension
+        working-directory: editors/vscode
+        env:
+          WEBFORMS_TEST_SERVER_LOG: ${{ github.workspace }}/artifacts/vscode-test-server.log
+        run: |
+          npm ci
+          npm run package
+          npm test
+
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: vscode-test-server-log
+          path: artifacts/vscode-test-server.log
+
+      - name: Claude Code plugin
+        run: node -e "for (const f of ['.claude-plugin/marketplace.json','editors/claude-code/.claude-plugin/plugin.json','editors/claude-code/.lsp.json','editors/claude-code/hooks/hooks.json']) JSON.parse(require('fs').readFileSync(f,'utf8'))"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: vsix
+          path: artifacts/vsix/*.vsix

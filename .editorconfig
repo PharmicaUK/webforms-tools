@@ -1,0 +1,15 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+
+[*.{csproj,props,targets,slnx,json,yml,yaml}]
+indent_size = 2
+
+[*.cs]
+# MarkupAttribute is an HTML/markup attribute, not a .NET custom attribute.
+dotnet_diagnostic.CA1711.severity = none

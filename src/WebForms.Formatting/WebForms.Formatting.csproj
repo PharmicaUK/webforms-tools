@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- VB formatter: Roslyn's public Formatter plus the VB "pretty listing" code-cleanup providers that Visual
+       Studio runs on line commit. Those providers are internal to Roslyn, so this project compiles against
+       publicized copies of the two Workspaces assemblies (Krafs.Publicizer adds IgnoresAccessChecksTo). Roslyn
+       is pinned to an exact version: an upgrade that changes the internals breaks the build, not a user's save.
+       After upgrading, run the corpus formatter check and the tests (see CLAUDE.md). -->
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="[5.9.0]" />
+    <PackageReference Include="Krafs.Publicizer" Version="2.3.2" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.CodeCleanup.CodeCleaner" />
+    <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.CodeCleanup.CodeCleanupOptions" />
+    <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.CodeCleanup.CodeCleanupOptionsProviders" />
+    <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.CodeCleanup.Providers.ICodeCleanupProvider" />
+    <Publicize Include="Microsoft.CodeAnalysis.Workspaces:Microsoft.CodeAnalysis.CodeCleanup.Providers.PredefinedCodeCleanupProviderNames" />
+  </ItemGroup>
+
+</Project>

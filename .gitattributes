@@ -1,0 +1,4 @@
+* text=auto
+
+# Test fixtures are compared byte-for-byte (BOM, CRLF, trailing whitespace): never normalize them.
+tests/**/Fixtures/** -text

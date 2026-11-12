@@ -1,0 +1,12 @@
+bin/
+obj/
+artifacts/
+out/
+*.user
+.vs/
+.idea/
+TestResults/
+node_modules/
+.vscode-test/
+*.vsix
+editors/vscode/LICENSE

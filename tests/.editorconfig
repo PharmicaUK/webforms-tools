@@ -1,0 +1,5 @@
+[*.cs]
+# Test names use underscores as word separators (Method_does_thing).
+dotnet_diagnostic.CA1707.severity = none
+# Inline expected-value arrays are clearer than static fields in tests.
+dotnet_diagnostic.CA1861.severity = none
