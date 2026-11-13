@@ -5,8 +5,10 @@ name: Release
 # extension (.vsix) to a GitHub Release.
 #
 # Publishing to nuget.org is a separate, manual step: run this workflow from the Actions tab ("Run workflow") with
-# the tag. It pushes that release's .nupkg. It needs the repository secret NUGET_API_KEY (an API key scoped to
-# push Pharmica.WebForms.Tools) and the environment "nuget" (add required reviewers there to gate it).
+# the tag. It pushes that release's .nupkg with NuGet trusted publishing: no stored API key, NuGet/login exchanges
+# the job's GitHub OIDC token for a short-lived one. Setup: a trusted publishing policy on nuget.org (owner
+# PharmicaUK, repository webforms-tools, workflow release.yml, environment nuget), the secret NUGET_USER (the
+# nuget.org account name) and the environment "nuget" (add required reviewers there to gate it).
 
 on:
   push:
@@ -74,7 +76,13 @@ jobs:
   nuget:
     if: github.event_name == 'workflow_dispatch'
     runs-on: windows-latest
-    environment: nuget
+    environment:
+      name: nuget
+      url: https://www.nuget.org/packages/Pharmica.WebForms.Tools
+    permissions:
+      contents: read
+      # Trusted publishing: NuGet/login swaps the OIDC token for a short-lived API key.
+      id-token: write
     steps:
       - name: Download the release's package
         shell: pwsh
@@ -86,10 +94,14 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: NuGet login (OIDC -> temporary API key)
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
       - name: Push to nuget.org
         shell: pwsh
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: |
-          if (-not $env:NUGET_API_KEY) { throw "The NUGET_API_KEY secret is not set" }
-          dotnet nuget push (Get-ChildItem nupkg/*.nupkg).FullName --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push (Get-ChildItem nupkg/*.nupkg).FullName --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
