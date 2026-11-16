@@ -66,7 +66,8 @@ editors/neovim/           README only: vim.lsp.config, conform.nvim and designer
 editors/claude-code/      Claude Code plugin: .lsp.json (server), hooks/hooks.json (`webforms hook claude`).
 .claude-plugin/           marketplace.json: this repo is the plugin's marketplace (`webforms@webforms-tools`).
 .github/workflows/        ci.yml (build, format, test, pack, VS Code test); release.yml (on a `v*` tag: GitHub
-                          Release with the nupkg and the .vsix; NuGet push when NUGET_API_KEY is set).
+                          Release with the nupkg and the .vsix; run by hand with a tag: NuGet push via
+                          trusted publishing, no stored key).
 ```
 
 ## Commands
